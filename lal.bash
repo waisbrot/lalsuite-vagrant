@@ -1,5 +1,7 @@
 . /etc/profile.d/lal-prep.sh
 
+set -ex
+
 export LSCSOFT_ROOTDIR=
 export LSCSOFT_SRCDIR=/opt/src/lscsoft
 
@@ -9,5 +11,16 @@ git config --global user.email anonymous@example.com
 
 mkdir -p $LSCSOFT_SRCDIR
 cd $LSCSOFT_SRCDIR
-git clone git://ligo-vcs.phys.uwm.edu/lalsuite.git .
-./00boot && ./configure && make && make install
+if [ -d .git ]; then
+  git pull
+else
+  git clone git://ligo-vcs.phys.uwm.edu/lalsuite.git .
+fi
+./00boot
+./configure --prefix=/opt/lscsoft
+make
+sudo make install
+
+for s in /opt/lscsoft/etc/*.{sh,csh}; do
+  sudo ln -s $s /etc/profile.d/
+done

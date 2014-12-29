@@ -4,6 +4,9 @@ function install_src {
   shift
   local filename=${url##*/}
   local dirname=${filename%.tar.gz}
+  if pkg-config $dirname; then
+    return
+  fi
   cd /tmp
   if [ ! -d $dirname ]; then
     wget $url -O - | tar xzf -
